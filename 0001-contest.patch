@@ -1,0 +1,163 @@
+From 8cb023a3aa5491436f9ee24b4cbfcddd2b1600cc Mon Sep 17 00:00:00 2001
+From: Boris Glavic <lordpretzel@gmail.com>
+Date: Mon, 19 Nov 2018 11:49:43 -0600
+Subject: [PATCH] contest
+
+---
+ contest/contest.c | 39 ++++++++++++++++++++-------------------
+ 1 file changed, 20 insertions(+), 19 deletions(-)
+
+diff --git a/contest/contest.c b/contest/contest.c
+index fade1eb..3cca694 100644
+--- a/contest/contest.c
++++ b/contest/contest.c
+@@ -51,16 +51,16 @@ completeWorkload1(double *t, long *ios)
+   TEST_CHECK(singleWorkload1 (100000, 1000, 10000, t, ios));
+ 
+   // large database + large buffer = test of in memory efficiency and fast access to pages in buffer manager
+-  TEST_CHECK(singleWorkload1 (1000000, 100, 100000, t, ios));  
++  TEST_CHECK(singleWorkload1 (1000000, 100, 100000, t, ios));
+ 
+   // small database + small buffer = test eviction and efficient disk access
+-  TEST_CHECK(singleWorkload1 (10000, 10000, 20, t, ios));  
++  TEST_CHECK(singleWorkload1 (10000, 10000, 20, t, ios));
+ 
+   // large database + small buffer = test eviction and efficient disk access
+-  TEST_CHECK(singleWorkload1 (1000000, 1000, 100, t, ios));  
++  TEST_CHECK(singleWorkload1 (1000000, 1000, 100, t, ios));
+ 
+   // very large database + small buffer = stress test scaling
+-  TEST_CHECK(singleWorkload1 (100000000, 10, 100, t, ios));  
++  TEST_CHECK(singleWorkload1 (100000000, 10, 100, t, ios));
+ 
+   return RC_OK;
+ }
+@@ -82,7 +82,7 @@ singleWorkload1 (int size, int numRequests, int numPages, double *t, long *ios)
+   // create table and insert data
+   TEST_CHECK(createTable("test_table_r",schema));
+   TEST_CHECK(openTable(table, "test_table_r"));
+-  
++
+   // insert rows into table
+   for(i = 0; i < size; i++)
+     {
+@@ -107,7 +107,7 @@ singleWorkload1 (int size, int numRequests, int numPages, double *t, long *ios)
+ 	  MAKE_BINOP_EXPR(sel, left, right, OP_COMP_EQUAL);
+ 
+ 	  TEST_CHECK(execScan(table, sel, schema));
+-	  
++
+ 	  freeExpr(sel);
+ 	  printf ("|");
+ 	}
+@@ -120,7 +120,7 @@ singleWorkload1 (int size, int numRequests, int numPages, double *t, long *ios)
+ 	  MAKE_BINOP_EXPR(sel, left, right, OP_COMP_EQUAL);
+ 
+ 	  TEST_CHECK(execScan(table, sel, schema));
+-	  
++
+ 	  freeExpr(sel);
+ 	  printf ("*");
+ 	}
+@@ -131,7 +131,7 @@ singleWorkload1 (int size, int numRequests, int numPages, double *t, long *ios)
+   (*t) += difftime(endTime,startTime);
+   (*ios) += getContestIOs();
+   printf("\nworkload 1 - N(R)=<%i>, #scans=<%i>, M=<%i>: %f sec, %ld I/Os\n", size, numRequests, numPages, *t, *ios);
+-  
++
+   // clean up
+   TEST_CHECK(closeTable(table));
+   TEST_CHECK(deleteTable("test_table_r"));
+@@ -148,7 +148,7 @@ execScan (RM_TableData *table, Expr *sel, Schema *schema)
+   RM_ScanHandle *sc = (RM_ScanHandle *) malloc(sizeof(RM_ScanHandle));
+   Record *r;
+   RC rc = RC_OK;
+-  
++
+   r = record1(schema, -1,"kkkk", -1);
+   TEST_CHECK(startScan(table, sc, sel));
+   while((rc = next(sc, r)) == RC_OK)
+@@ -157,10 +157,10 @@ execScan (RM_TableData *table, Expr *sel, Schema *schema)
+     TEST_CHECK(rc);
+ 
+   TEST_CHECK(closeScan(sc));
+-  
++
+   free(sc);
+   freeRecord(r);
+-  
++
+   return RC_OK;
+ }
+ 
+@@ -170,11 +170,11 @@ completeWorkload2(double *t, long *ios)
+ {
+   // 70 - inserts, every 100th operation is a scan
+   TEST_CHECK(singleWorkload2 (10000, 100000, 100, 70, 100, t, ios));
+-  
++
+   // 100 inserts, every 1000th operation is a scan
+   TEST_CHECK(singleWorkload2 (100, 100000, 50, 100, 1000, t, ios));
+ 
+-  // large database, only 10 scans 
++  // large database, only 10 scans
+   TEST_CHECK(singleWorkload2 (1000000, 100000, 100, 70, 10000, t, ios));
+ 
+   return RC_OK;
+@@ -202,12 +202,13 @@ singleWorkload2 (int size, int numRequests, int numPages, int percInserts, int s
+   // create table and insert data
+   TEST_CHECK(createTable("test_table_r",schema));
+   TEST_CHECK(openTable(table, "test_table_r"));
+-  
++
+   // insert rows into table
+   for(inserted = 0; inserted < size; inserted++)
+     {
+       r = record1(schema, inserted, randomString(4), randomInt(0, size / 100));
+       TEST_CHECK(insertRecord(table,r));
++	  rids[inserted] = r->id;
+       freeRecord(r);
+     }
+ 
+@@ -223,7 +224,7 @@ singleWorkload2 (int size, int numRequests, int numPages, int percInserts, int s
+ 	  // do insert or delete? 70% are inserts
+ 	  if (rand() % 100 <= percInserts)
+ 	    {
+-	       r = record1(schema, i, randomString(4), randomInt(0, size / 100));
++	       r = record1(schema, i + inserted + 1, randomString(4), randomInt(0, size / 100));
+ 	       TEST_CHECK(insertRecord(table,r));
+ 	       rids[inserted++] = r->id;
+ 	       printf("i");
+@@ -252,7 +253,7 @@ singleWorkload2 (int size, int numRequests, int numPages, int percInserts, int s
+ 	      MAKE_BINOP_EXPR(sel, left, right, OP_COMP_EQUAL);
+ 
+ 	      TEST_CHECK(execScan(table, sel, schema));
+-	  
++
+ 	      freeExpr(sel);
+ 	      printf ("|");
+ 	    }
+@@ -265,7 +266,7 @@ singleWorkload2 (int size, int numRequests, int numPages, int percInserts, int s
+ 	      MAKE_BINOP_EXPR(sel, left, right, OP_COMP_EQUAL);
+ 
+ 	      TEST_CHECK(execScan(table, sel, schema));
+-	  
++
+ 	      freeExpr(sel);
+ 	      printf ("*");
+ 	    }
+@@ -358,9 +359,9 @@ randomString (int length)
+ {
+   char *result = (char *) malloc(length);
+   int i;
+-  
++
+   for(i = 0; i < length; result[i++] = (char) rand() % 256)
+     ;
+-      
++
+   return result;
+ }
+-- 
+2.19.1
+
