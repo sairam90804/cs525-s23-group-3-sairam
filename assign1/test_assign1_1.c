@@ -21,7 +21,7 @@ static void testSinglePageContent(void);
 int
 main (void)
 {
-  testName = "";
+  testName = "Testing_CS525_Group_3";
   
   initStorageManager();
 
