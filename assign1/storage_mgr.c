@@ -1,6 +1,7 @@
 #include "storage_mgr.h"
 #include<stdio.h>
 #include<stdlib.h>
+#include<string.h>
 #include "dberror.h"
 FILE *file;
 
@@ -55,7 +56,7 @@ RC createPageFile (char *fileName)
 		printf("Do you want the existing file to be overwritten? Press Y/N \n");
 		scanf("%c",&input);
 		if(input == 'n' || input == 'N'){
-			printf("The file already exist and will not be overwritten");
+			printf("The file already exist and will not be overwritten\n");
 			fclose(file);
 			return RC_OK;
 		}
@@ -237,7 +238,7 @@ int getBlockPos (SM_FileHandle *filehandle){
 	//Validate the given filehandle, If Validation returns RC_OK then check the current page position
 	if(validateFileHandle(filehandle) == RC_OK){
         //Print the Position in the File and return the integer
-	    printf("%d ",filehandle->curPagePos);
+	    printf("%d \n",filehandle->curPagePos);
 	    pos = filehandle->curPagePos;
     }
 	//Return the Position
@@ -293,7 +294,7 @@ RC writeBlock (int pageNum, SM_FileHandle *filehandle, SM_PageHandle memPage) {
 	//If the Validation returns RC_OK, Then Check whether the buffer storage pointer is not null
 	if((code == RC_OK) && (memPage !=NULL)){
 		//Ensure whether the current file has the free space to store the input data, else add required additional pages to the file
-		ensureCapacity(sizeof(memPage)/PAGE_SIZE,filehandle);
+		ensureCapacity(strlen(memPage)/PAGE_SIZE,filehandle);
 		//Opens a file to update both reading and writing and store it in the file variable
 		file = fopen(filehandle->fileName,"r+");
 		//Move the file pointer of the File handle from the starting of the page (SEEK_SET) to the end of the page
@@ -354,6 +355,7 @@ RC appendEmptyBlock (SM_FileHandle *fHandle) {
 
 RC ensureCapacity (int numberOfPages, SM_FileHandle *fHandle) {
 
+	printf("Running Ensure Capacity to check whether the number of input pages is greater than the total number of pages in the current file \n");
  	//Initialise the variable to store return code
 	RC code;
 	//Check whether the file has the capacity to accomodate the input number of pages
@@ -362,6 +364,7 @@ RC ensureCapacity (int numberOfPages, SM_FileHandle *fHandle) {
         code = RC_OK;
     }
     else {
+		printf("Number of input pages is greater than the Total Number of pages in the file. Appending more pages \n");
     	int i, numPages_toAdd;
 		//Calculating the number of pages to be added
         numPages_toAdd = numberOfPages - fHandle->totalNumPages;

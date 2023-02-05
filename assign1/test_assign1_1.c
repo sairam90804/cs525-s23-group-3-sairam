@@ -16,6 +16,7 @@ char *testName;
 /* prototypes for test functions */
 static void testCreateOpenClose(void);
 static void testSinglePageContent(void);
+static void testMultiplePageContent(void);
 
 /* main function running all tests */
 int
@@ -27,6 +28,7 @@ main (void)
 
   testCreateOpenClose();
   testSinglePageContent();
+  testMultiplePageContent();
 
   return 0;
 }
@@ -40,6 +42,8 @@ testCreateOpenClose(void)
   SM_FileHandle fh;
 
   testName = "test create open and close methods";
+
+  printf("\n........................Test for Create and Open Page Started........................\n");
 
   TEST_CHECK(createPageFile (TESTPF));
   
@@ -67,6 +71,7 @@ testSinglePageContent(void)
 
   testName = "test single page content";
 
+   printf("\n........................Test for Single Page content Started........................\n");
   // allocate memory for a page
   ph = (SM_PageHandle) malloc(PAGE_SIZE);
 
@@ -91,6 +96,51 @@ testSinglePageContent(void)
   // read back the page containing the string and check that it is correct
   TEST_CHECK(readFirstBlock (&fh, ph));
   for (i=0; i < PAGE_SIZE; i++)
+    ASSERT_TRUE((ph[i] == (i % 10) + '0'), "character in page read from disk is the one we expected.");
+  printf("reading first block\n");
+
+  // destroy new page file
+  TEST_CHECK(closePageFile (&fh));
+  TEST_CHECK(destroyPageFile (TESTPF));  
+
+  // free page memory
+  free(ph);
+  
+  TEST_DONE();
+}
+
+/* Try to create, open, write a multiple page content and close a page file */
+void testMultiplePageContent(void) {
+  SM_FileHandle fh;
+  SM_PageHandle ph;
+  int i;
+
+  testName = "test Multiple page content";
+  printf("\n........................Test for Multiple Page content Started........................\n");
+  // allocate memory for a page
+  ph = (SM_PageHandle) malloc(PAGE_SIZE*4);
+
+  // create a new page file
+  TEST_CHECK(createPageFile (TESTPF));
+  TEST_CHECK(openPageFile (TESTPF, &fh));
+  printf("created and opened file\n");
+  
+  // read first page into handle
+  TEST_CHECK(readFirstBlock (&fh, ph));
+  // the page should be empty (zero bytes)
+  for (i=0; i < PAGE_SIZE*4; i++)
+    ASSERT_TRUE((ph[i] == 0), "expected zero byte in first page of freshly initialized page");
+  printf("first block was empty\n");
+    
+  // change ph to be a string and write that one to disk
+  for (i=0; i < PAGE_SIZE*4; i++)
+    ph[i] = (i % 10) + '0';
+  TEST_CHECK(writeBlock (0, &fh, ph));
+  printf("writing first block\n");
+
+  // read back the page containing the string and check that it is correct
+  TEST_CHECK(readFirstBlock (&fh, ph));
+  for (i=0; i < PAGE_SIZE*4; i++)
     ASSERT_TRUE((ph[i] == (i % 10) + '0'), "character in page read from disk is the one we expected.");
   printf("reading first block\n");
 

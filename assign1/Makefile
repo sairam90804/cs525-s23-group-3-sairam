@@ -6,6 +6,6 @@ assignment1: $(OBJ)
 %.o: %.c
 	$(CC) -g -c $<
 run: assignment1
-	./test_assign1_1
+	./test_assign1_1 > log.txt
 clean:
-	rm -rf test_assign1_1 *.o
+	rm -rf test_assign1_1 *.o log.txt
