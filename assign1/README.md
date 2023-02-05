@@ -24,7 +24,7 @@ Script Execution----
 Functions Implemented- 
 
 
---------- IMPLEMENTED BY INDRAJIT GOSH ------------------------------------------
+--------- IMPLEMENTED BY INDRAJIT GHOSH ------------------------------------------
 
 A) createPageFile 
 Here we are creating a new file,as per the requirement the initial file size should be one page , and this single page should be filled 
