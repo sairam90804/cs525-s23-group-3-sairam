@@ -44,6 +44,8 @@ D) destroyPageFile
 
 The destroy page file functions removes the file from the file system
 
+--------- IMPLEMENTED BY VIVEKANAND REDDY MALIPATEL ------------------------------------------
+
 E) readBlock
 
 Reading the File with the given pagenumber, filehandle and Buffer
@@ -73,6 +75,8 @@ This function sets the page number to a page after the current page position of 
 K) readLastBlock
 
 This function sets the page number to a last page position of the file and call the readBlock
+
+--------- IMPLEMENTED BY SAI RAM ODURI ------------------------------------------
 
 L) writeBlock
 
