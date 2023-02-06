@@ -13,6 +13,31 @@ void initStorageManager()
 }
 // create new file of one page
 
+RC createFile(char *fileName) {
+
+	RC code;
+	file = fopen(fileName,"w");
+	//Allocate memory a single page with page size as 2mb i.e 2048 bytes with calloc function
+	char *ptr=(char *)calloc(PAGE_SIZE,sizeof(char));
+	//Write the single page of 2mb size to a file
+	if(fwrite(ptr,sizeof(char),PAGE_SIZE,file) == PAGE_SIZE) {
+		//Move the file pointer to the end of the file
+		fseek(file,0,SEEK_END);
+		//Free the memory allocated by calloc
+		free(ptr);
+		//Close the file
+		fclose(file);
+		RC_message="File creation has been completed!!";
+		code = RC_OK;
+	}
+	else {
+		free(ptr);
+		RC_message="Page Creation Failed";
+		code = RC_WRITE_FAILED;
+	}
+	return code;
+}
+
 RC createPageFile (char *fileName)
 { 
 	/*Here we are creating a new file,as per the requirement the initial 
@@ -20,34 +45,15 @@ RC createPageFile (char *fileName)
 	with 0 bytes. Hence we need to use calloc() version of dynamic memory 
 	allocation , since by default all the blocks created are intialized to 0
 	instead of garbage values
-
    */
+  	RC code;
   	//Initialize the input variable
   	char input;
   	//Open File 
-  	file=fopen(fileName,"r");
+  	file = fopen(fileName,"r");
   	//Create new File 
   	if (file == NULL) {
-		//Open the new file for writing
-		file=fopen(fileName,"w");
-		//Allocate memory a single page with page size as 2mb i.e 2048 bytes with calloc function
-		char *ptr=(char *)calloc(PAGE_SIZE,sizeof(char));
-		//Write the single page of 2mb size to a file
-		if(fwrite(ptr,sizeof(char),PAGE_SIZE,file) == PAGE_SIZE) {
-			//Move the file pointer to the end of the file
-			fseek(file,0,SEEK_END);
-			//Free the memory allocated by calloc
-			free(ptr);
-			//Close the file
-			fclose(file);
-			RC_message="File creation has been completed!!";
-			return RC_OK;
-		}
-		else {
-			free(ptr);
-			RC_message="Page Creation Failed";
-			return RC_WRITE_FAILED;
-		}
+		code = createFile(fileName);
   	}
   	//if the file is already present with the same filename
   	else {
@@ -58,38 +64,20 @@ RC createPageFile (char *fileName)
 		if(input == 'n' || input == 'N'){
 			printf("The file already exist and will not be overwritten\n");
 			fclose(file);
-			return RC_OK;
+			code = RC_OK;
 		}
 		//Overwrite the file again
 		else if (input == 'y' || input == 'Y') {	
-			//Open the new file for writing
-			file=fopen(fileName,"w");
-			//Allocate memory a single page with page size as 2mb i.e 2048 bytes with calloc function
-			char *ptr=(char *)calloc(PAGE_SIZE,sizeof(char));
-			//Write the single page of 2mb size to a file
-			if(fwrite(ptr,sizeof(char),PAGE_SIZE,file) == PAGE_SIZE) {
-				//Move the file pointer to the end of the file
-				fseek(file,0,SEEK_END);
-				//Free the memory allocated by calloc
-				free(ptr);
-				//Close the file
-				fclose(file);
-				RC_message="File creation has been completed!!";
-				return RC_OK;
-			}
-			else {
-				free(ptr);
-				RC_message="Page Creation Failed";
-				return RC_WRITE_FAILED;
-			}
+			code = createFile(fileName);
 		}
 		else {
 			//If the user inputs other then y or n 
 			printf("Incorrect Input given by user \n");
 			RC_message="Execution is has been stopped to due incorrect user input!! \n";
-			return RC_WRITE_FAILED;
+			code = RC_WRITE_FAILED;
 		}
   	}
+	return code;
 }
 
 RC openPageFile(char *fileName,SM_FileHandle *fileHandle) {
