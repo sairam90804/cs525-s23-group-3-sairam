@@ -109,14 +109,16 @@ testSinglePageContent(void)
   TEST_DONE();
 }
 
+//**********************************NEW TESTCASE ADDED***************************
+
 /* Try to create, open, write a multiple page content and close a page file */
 void testMultiplePageContent(void) {
   SM_FileHandle fh;
   SM_PageHandle ph;
   int i;
 
-  testName = "test Multiple page content";
-  printf("\n........................Test for Multiple Page content Started........................\n");
+  testName = "\ntest Multiple page content\n";
+  printf("..........................Test for Multiple Page content Started........................\n\n\n\n\n\n\n\n\n");
   // allocate memory for a page
   ph = (SM_PageHandle) malloc(PAGE_SIZE*4);
 

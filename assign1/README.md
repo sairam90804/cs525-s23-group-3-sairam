@@ -101,5 +101,8 @@ O) ensureCapacity
 
 This ensures that the File has capacity to store the input data. Or Add new pages to the file, as requried.
 
+-------------------------------------------------------------------------------------------------------------------------------------------
 
+New Testcase Implemented :- 
 
+We have added a new testcase which will test the ensure capacity funcion by trying to write the data when the number of input pages is greater than the Total number of pages in the current file.

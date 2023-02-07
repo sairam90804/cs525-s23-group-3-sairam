@@ -18,11 +18,7 @@ RC createFile(char *fileName);
 RC validateFileHandle (SM_FileHandle *filehandle);
 RC validateFile (int pageNum, SM_FileHandle *filehandle);
 
-
-
-
 // create new file of one page
-
 RC createFile(char *fileName) {
 
 	RC code;
