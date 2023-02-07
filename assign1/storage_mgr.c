@@ -11,6 +11,16 @@ void initStorageManager()
     printf("Sucessfully Initate Storage Manager\n");
     printf("Page file creation will begin now !!\n");
 }
+
+
+//Local function prototype declaration 
+RC createFile(char *fileName);
+RC validateFileHandle (SM_FileHandle *filehandle);
+RC validateFile (int pageNum, SM_FileHandle *filehandle);
+
+
+
+
 // create new file of one page
 
 RC createFile(char *fileName) {
